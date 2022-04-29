@@ -1,0 +1,165 @@
+
+
+
+#A is BDNF activity, B is BDNF mRNA, CEBP is CEBP
+stim1 = test1*(HEAV(T-t2)*HEAV(dur+t2-T)+HEAV(T-t2-3600*step)*HEAV(dur+t2+3600*step-T)*0)+0*(1-HEAV(T-t2)*HEAV(dur+t2-T))
+
+t2=3600*48
+test1=0.03
+dur=60
+
+
+dA/dt=0.3*stim1+15*pCaMK/(pCaMK+0.0073)*0.0001*B/(B+0.03)*(1-PSI)-0.00066*A/(A+0.6)
+
+dB/dt=((0.00000016*(1+1*ComAct)+feed3)- 0.000045*B/(B+0.6))
+
+#from C/EBP to BDNF
+feed3=0.00016*(CEBP^2)/(3.2^2+CEBP^2+(ComRep)^2)
+
+
+k_1=12.5
+k_trs=1
+kdega=0.00066
+K_A2=0.6
+k_2=0.00000726
+kdegb=0.0000226
+K_min_B=0.000000078
+K_B2=0.6
+
+BDNF=A
+
+
+pCaMK'=((0.15*stim1+K_phosC1+feed5)*CaMK-K_dephC1*pCaMK)
+CaMK=CaMKt-pCaMK
+CaMKt=0.085
+
+K_phosC1=0.0000036
+
+K_dephC1=0.00011
+
+#from BDNF to CaMKII
+
+feed5=0.000053*(BDNF*(1-ANTI))^2/((BDNF*(1-ANTI))^2+0.28^2)+0.000041*pCaMK^2/(pCaMK^2+0.03^2)
+
+
+pCREB1'=(K_phosCR1+feed4)*CREB1-K_dephCR1*pCREB1
+CREB1=CREBt-pCREB1
+CREBt=0.085
+K_phosCR1=0.00000081/0.25
+K_dephCR1=0.000024/0.25
+
+#from BDNF to CREB
+feed4=0.004*(BDNF*(1-ANTI))^2/((BDNF*(1-ANTI))^2+2^2)
+
+
+CEBP'=((feed2+K_min_C)*(CEBPmax-CEBP)*(1-PSI)-K_dxCBP*CEBP/(CEBP+K_dCEBP))/taucebp
+CEBPmax=0.228
+taucebp=3
+
+K_min_C=0.0000158 
+K_dCEBP=0.076
+K_dxCBP=0.00000565
+
+#from CREB to CEBP
+feed2 =0.0022*((pCREB1)^2)/((pCREB1)^2+0.19^2)
+
+
+SIN3A'=((120000*RATE*stim1+HDAC2*MeCP2)*(5-SIN3A)/4-SIN3A)/(50000*tauSin)
+MeCP2'=(SIN3A*HDAC2*(5-MeCP2)/4-(4)*pCaMK^2/(pCaMK^2+(3)*(0.006628)^2)*MeCP2)/10000
+HDAC2'=((SIN3A*MeCP2)*(5-HDAC2)/4-HDAC2)/(500000/4*tauHDAC2)
+ComAct'=(0.34*(MeCP2-1)/(SIN3A*HDAC2)*(5-ComAct)-ComAct)/(tauAct)
+ComRep'=((4.5*(MeCP2-1)*(SIN3A-1)*(HDAC2-1))*(5-ComRep)-1/150*ComRep)/(tauRep)
+
+tauHDAC2=1
+RATE=1
+tauSin=1
+
+tauRep=10000*3.6
+tauAct=10000*3.6*0.4
+
+
+tf1'=(pCREB1*0.0066/0.007*0.12*(1-tf1)*(1-PSI)-0.03*tf1)/(1000)
+
+tf2'=(CEBP*0.012*(1-tf2)*(1-PSI)-0.03*tf2)/(500)
+
+
+tag1'=(0.5*pCaMK*(1-tag1)-0.03*tag1)/(5*tautag)
+GROD'=(7.5*tf1/(tf1+1)*tf2/(tf2+1)*(1-PSI)+0.0004-0.05*GROD)/(2000*tauGROD)
+
+tautag=1
+tauGROD=1
+
+
+W'=(F6-0.08*W)/(taup)
+
+F6=(bas+1680*DriFor)*P/(P+13.3)*(1-PSI)
+bas=0.48
+
+DriFor=(tag1*GROD-0.012)*heav(tag1*GROD-0.012)
+
+P'=(PP-F6-0.08*P)/(taup)
+
+PP'=(0.8*W^2/(W^2+0.9^2)*(1-PSI)-PP)/(taup*30)
+
+taup=10000*2.5
+
+
+
+#PSI
+PSI=0.8*HEAV(T-t3)*HEAV(dur3+t3-T)+0*(1-HEAV(T-t3)*HEAV(dur3+t3-T))
+
+
+t3=t2+3600*(-1+1*step)
+dur3=3600*6
+
+
+a4=(step-10*flr(step/10))
+a3=flr((step-100*flr(step/100))/10)
+a2=flr((step-1000*flr(step/1000))/100)
+a1=flr(step/1000)
+
+
+aux 1=(T-t2)/(3600*24)
+aux 2=stim1
+aux 3=(BDNF)/0.0736*100
+aux 4=(B)/0.0034*100
+aux 5=(pCREB1)/0.007*100
+aux 6=(CEBP)/0.077*100
+aux 7=(pCaMK)/0.006628*100
+aux 8=MeCP2/1*100
+aux 9=SIN3A/1*100
+aux 19=HDAC2/1*100
+aux 10=a4
+aux 11=a3
+aux 12=W/0.3*100 
+aux 13=DriFor
+aux 14=(0.6-W)/0.6*100
+aux 15=P+W
+aux 16=ComRep
+aux 17=ComAct
+
+
+init A=0.0736
+init B=0.0034
+init pCREB1=0.007
+init pCaMK=0.006628
+init CEBP=0.077
+init MeCP2=1
+init SIN3A=1
+init HDAC2=1
+init tag1=0.1
+init tf1=0.025
+init tf2=0.03
+init GROD=0.12
+init W=0.3
+init p=0.7
+init PP=0.08
+
+
+p step=30
+p step2=1
+
+@ total=890000, xlo=0, xhi=5000, ylo=0, yhi=10, bounds=10e30, MAXSTOR=1300000,xp=vs, yp=mk,nout=2500, dt=0.05,
+
+
+@ RANGE=1, RANGEOVER=step, RANGESTEP=80, RANGELOW=0, RANGEHIGH=80, RANGERESET=yes, RANGEOLDIC=yes, output=test4
