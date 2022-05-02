@@ -29,17 +29,20 @@ K_B2=0.6
 BDNF=A
 
 
-pCaMK'=((0.15*stim1+K_phosC1+feed5)*CaMK-K_dephC1*pCaMK)
+pCaMK'=((0.225*stim1+K_phosC1+feed5)*CaMK-K_dephC1*pCaMK)/1.5
+
 CaMK=CaMKt-pCaMK
 CaMKt=0.085
 
-K_phosC1=0.0000036
 
-K_dephC1=0.00011
+K_phosC1=0.00000082/0.15
+
+K_dephC1=0.000024/0.15
+
 
 #from BDNF to CaMKII
 
-feed5=0.000053*(BDNF*(1-ANTI))^2/((BDNF*(1-ANTI))^2+0.28^2)+0.000041*pCaMK^2/(pCaMK^2+0.03^2)
+feed5=0.00008*(BDNF*(1-ANTI))^2/((BDNF*(1-ANTI))^2+0.28^2)+0.0000612*pCaMK^2/(pCaMK^2+0.03^2)
 
 
 pCREB1'=(K_phosCR1+feed4)*CREB1-K_dephCR1*pCREB1
@@ -104,6 +107,8 @@ PP'=(0.8*W^2/(W^2+0.9^2)*(1-PSI)-PP)/(taup*30)
 taup=10000*2.5
 
 
+#ODN
+ANTI=0.8*0*HEAV(T-t3)*HEAV(dur3+t3-T)+0*(1-HEAV(T-t3)*HEAV(dur3+t3-T))
 
 #PSI
 PSI=0.8*HEAV(T-t3)*HEAV(dur3+t3-T)+0*(1-HEAV(T-t3)*HEAV(dur3+t3-T))
